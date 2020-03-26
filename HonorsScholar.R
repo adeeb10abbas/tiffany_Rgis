@@ -100,7 +100,8 @@ count$INTPTLON <- NULL
 
 # joining count and spatial data to use ggplot
 philly_count <- geo_join(philly_sp, count, "NAMELSAD", "NAMELSAD")
+philly_count_sf <- st_as_sf(philly_count)
 
 ggplot() +
-  geom_polygon(aes(x = INTPTLON, y = INTPTLON, group = philly_count$group, fill = philly_count_df$private_points), data = philly_count_df)
+  + geom_sf(aes(fill = public_density), data = philly_count_sf) 
 
