@@ -18,30 +18,6 @@ private_gsi_regs <- fortify(private_gsi_regs)
 private_gsi_retro <- st_read("Desktop/HonorsScholar/DataSets/GSI_Private_Projects_Retrofit/GSI_Private_Projects_Retrofit.shp")
 private_gsi_retro <- fortify(private_gsi_retro)
 
-# plot public GIS projects and census tracts
-ggplot() + 
-  geom_polygon(aes(x = long, y = lat, group = group), data = philly_df) +
-  geom_sf(data = public_gsi)
-# plot private regulation GIS projects and census tracts
-ggplot() +
-  geom_polygon(aes(x = long, y = lat, group = group), data = philly_df) +
-  geom_sf(data = private_gsi_regs)
-# plot private retrofit GIS projects and census tracts
-ggplot() +
-  geom_polygon(aes (x= long, y = lat, group = group), data = philly_df) +
-  geom_sf(data = private_gsi_retro)
-# plot all private GSI and census tracts
-ggplot() +
-  geom_polygon(aes (x= long, y = lat, group = group), data = philly_df) +
-  geom_sf(data = private_gsi_regs) +
-  geom_sf(data = private_gsi_retro)
-# plot all GSI and census tracts
-ggplot() +
-  geom_polygon(aes (x= long, y = lat, group = group), data = philly_df) +
-  geom_sf(data = public_gsi) +
-  geom_sf(data = private_gsi_regs) +
-  geom_sf(data = private_gsi_retro)
-
 # convert public_gsi to spatial points dataframe to be able to use poly.counts()
 public_sp <- as_Spatial(public_gsi)
 public_sp <- spTransform(public_sp, crs(philly_sp)) # converts to same coordinate system as philly_sp
@@ -102,6 +78,25 @@ count$INTPTLON <- NULL
 philly_count <- geo_join(philly_sp, count, "NAMELSAD", "NAMELSAD")
 philly_count_sf <- st_as_sf(philly_count)
 
+# maps with density coded in as fill
 ggplot() +
-  + geom_sf(aes(fill = public_density), data = philly_count_sf) 
+  geom_sf(aes(fill = public_density), data = philly_count_sf) 
+ggplot() +
+  geom_sf(aes(fill = regs_density), data = philly_count_sf)
+ggplot() +
+  geom_sf(aes(fill = retro_density), data = philly_count_sf)
+ggplot() +
+  geom_sf(aes(fill = private_density), data = philly_count_sf)
+ggplot() +
+  geom_sf(aes(fill = all_density), data = philly_count_sf)
+
+# import census data
+income <- read.csv("Desktop/HonorsScholar/DataSets/ACS_17_5YR_S1903/ACS_17_5YR_S1903_with_ann.csv", header = TRUE)
+demographics <- read.csv("Desktop/HonorsScholar/DataSets/ACS_17_5YR_S0601/ACS_17_5YR_S0601_with_ann.csv", header = TRUE)
+colnames(income)[2] <- "GEOID"
+colnames(demographics)[2] <- "GEOID"
+
+# join demographic data with points data
+philly_count_sf$GEOID <-as.numeric(philly_count_sf$GEOID)
+count_demographics <- geo_join(philly_count_sf, demographics, "GEOID", 'GEOID')
 
