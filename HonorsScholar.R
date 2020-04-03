@@ -99,4 +99,15 @@ colnames(demographics)[2] <- "GEOID"
 # join demographic data with points data
 philly_count_sf$GEOID <-as.numeric(philly_count_sf$GEOID)
 count_demographics <- geo_join(philly_count_sf, demographics, "GEOID", 'GEOID')
+count_demographics_df <- as.data.frame(count_demographics)
+count_demographics_df$Total..Estimate..Total.population <- as.numeric(count_demographics_df$Total..Estimate..Total.population)
 
+for (i in 1:nrow(count_demographics_df)){
+  if(count_demographics_df$Total..Estimate..Total.population[i] == 0) {
+    count_demographics_df$public_density[i] <- NA
+    count_demographics_df$regs_density[i] <- NA
+    count_demographics_df$retro_density[i] <- NA
+    count_demographics_df$private_density[i] <- NA
+    count_demographics_df$all_density[i] <- NA
+  }
+}
